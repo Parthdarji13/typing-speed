@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Levels() {
+  const navigate = useNavigate();
+
   const levels = [
     {
       name: "Easy",
@@ -43,11 +47,14 @@ export default function Levels() {
               if (locked) {
                 alert("This level is locked. Complete previous levels first!");
               } else {
-                alert(`Starting ${name} level!`);
+                if (name === "Easy") {
+                  navigate("/levels/easy");
+                } else {
+                  alert(`Starting ${name} level!`);
+                }
               }
             }}
           >
-            {/* Locked badge */}
             {locked && (
               <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full z-10 select-none">
                 LOCKED

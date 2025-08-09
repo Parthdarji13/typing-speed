@@ -6,9 +6,9 @@ import LoginModal from "./components/LoginModal";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Levels from "./pages/Levels";
+import EasySublevels from "./pages/EasySublevels";
 
 function AppWrapper() {
-  // useNavigate can only be used inside components rendered by Router
   const navigate = useNavigate();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -48,15 +48,19 @@ function AppWrapper() {
       />
 
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home onStartChallengeClick={handleLoginClick} />} />
         <Route path="/about" element={<About />} />
 
         {/* Protected Levels route */}
         <Route
           path="/levels"
-          element={
-            isLoggedIn ? <Levels /> : <Navigate to="/" replace />
-          }
+          element={isLoggedIn ? <Levels /> : <Navigate to="/" replace />}
+        />
+        
+        {/* Protected Easy Sublevels route */}
+        <Route
+          path="/levels/easy"
+          element={isLoggedIn ? <EasySublevels /> : <Navigate to="/" replace />}
         />
       </Routes>
 
