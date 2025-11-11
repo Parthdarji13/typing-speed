@@ -7,20 +7,37 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [showRegisterMsg, setShowRegisterMsg] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setErrorMsg("");
     if (isRegistering) {
-      // Dummy delay simulating backend call - replace with real API call
-      await new Promise((res) => setTimeout(res, 1000));
-      setShowRegisterMsg(true);
-      setName("");
-      setEmail("");
-      setTimeout(() => {
-        setShowRegisterMsg(false);
-        setIsRegistering(false);
-      }, 10000);
+      try {
+        setSubmitting(true);
+        const resp = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:4000"}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email }),
+        });
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          throw new Error(data.error || "Registration failed");
+        }
+        setShowRegisterMsg(true);
+        setName("");
+        setEmail("");
+        setTimeout(() => {
+          setShowRegisterMsg(false);
+          setIsRegistering(false);
+        }, 10000);
+      } catch (err) {
+        setErrorMsg(err.message || "Something went wrong");
+      } finally {
+        setSubmitting(false);
+      }
     } else {
       // Login logic here
       onLoginSuccess();
@@ -87,11 +104,18 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
 
               <button
                 type="submit"
-                className="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-extrabold py-3 rounded-full shadow-lg transition-transform hover:scale-105"
+                disabled={submitting}
+                className={`w-full ${submitting ? "bg-yellow-300 cursor-not-allowed" : "bg-yellow-400 hover:bg-yellow-500"} text-blue-900 font-extrabold py-3 rounded-full shadow-lg transition-transform ${submitting ? "" : "hover:scale-105"}`}
               >
-                {isRegistering ? "Register" : "Login"}
+                {submitting ? (isRegistering ? "Registering..." : "Logging in...") : (isRegistering ? "Register" : "Login")}
               </button>
             </form>
+
+            {errorMsg && (
+              <div className="mt-3 text-center text-red-300 text-sm">
+                {errorMsg}
+              </div>
+            )}
 
             <p className="mt-5 text-center text-yellow-300 font-semibold select-none">
               {isRegistering ? (

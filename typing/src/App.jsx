@@ -7,6 +7,18 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Levels from "./pages/Levels";
 import EasySublevels from "./pages/EasySublevels";
+import MediumSublevels from "./pages/MediumSublevels";
+import HardSublevels from "./pages/HardSublevels";
+import EasyLevel1 from "./pages/EasyLevel1";
+import EasyLevel2 from "./pages/EasyLevel2";
+import EasyLevel3 from "./pages/EasyLevel3";
+import MediumLevel1 from "./pages/MediumLevel1";
+import MediumLevel2 from "./pages/MediumLevel2";
+import MediumLevel3 from "./pages/MediumLevel3";
+import HardLevel1 from "./pages/HardLevel1";
+import HardLevel2 from "./pages/HardLevel2";
+import HardLevel3 from "./pages/HardLevel3";
+import ImpossibleLevel from "./pages/ImpossibleLevel";
 
 function AppWrapper() {
   const navigate = useNavigate();
@@ -17,11 +29,12 @@ function AppWrapper() {
   const [showToast, setShowToast] = useState(false);
 
   const handleLoginClick = () => setShowLoginModal(true);
+
   const handleLogout = () => {
     setIsLoggedIn(false);
     setToastMsg("Logged out successfully!");
     setShowToast(true);
-    navigate("/"); // redirect to home on logout
+    navigate("/");
   };
 
   const handleLoginSuccess = () => {
@@ -29,7 +42,7 @@ function AppWrapper() {
     setShowLoginModal(false);
     setToastMsg("Login successful! Welcome back!");
     setShowToast(true);
-    navigate("/levels"); // redirect to levels page after login
+    navigate("/levels");
   };
 
   useEffect(() => {
@@ -48,20 +61,42 @@ function AppWrapper() {
       />
 
       <Routes>
-        <Route path="/" element={<Home onStartChallengeClick={handleLoginClick} />} />
+        <Route
+          path="/"
+          element={<Home onStartChallengeClick={handleLoginClick} />}
+        />
         <Route path="/about" element={<About />} />
 
-        {/* Protected Levels route */}
-        <Route
-          path="/levels"
-          element={isLoggedIn ? <Levels /> : <Navigate to="/" replace />}
-        />
-        
-        {/* Protected Easy Sublevels route */}
-        <Route
-          path="/levels/easy"
-          element={isLoggedIn ? <EasySublevels /> : <Navigate to="/" replace />}
-        />
+        {/* Levels route - accessible to all users */}
+        <Route path="/levels" element={<Levels />} />
+
+        {/* Easy Sublevels route - accessible to all users */}
+        <Route path="/levels/easy" element={<EasySublevels />} />
+
+        {/* Medium Sublevels route - accessible to all users */}
+        <Route path="/levels/medium" element={<MediumSublevels />} />
+
+        {/* Hard Sublevels route - accessible to all users */}
+        <Route path="/levels/hard" element={<HardSublevels />} />
+
+        {/* Easy sublevel pages */}
+        <Route path="/easylevel1" element={<EasyLevel1 />} />
+        <Route path="/easylevel2" element={<EasyLevel2 />} />
+        <Route path="/easylevel3" element={<EasyLevel3 />} />
+
+        {/* Medium sublevel pages */}
+        <Route path="/mediumlevel1" element={<MediumLevel1 />} />
+        <Route path="/mediumlevel2" element={<MediumLevel2 />} />
+        <Route path="/mediumlevel3" element={<MediumLevel3 />} />
+
+        {/* Hard sublevel pages */}
+        <Route path="/hardlevel1" element={<HardLevel1 />} />
+        <Route path="/hardlevel2" element={<HardLevel2 />} />
+        <Route path="/hardlevel3" element={<HardLevel3 />} />
+
+        {/* Impossible level page */}
+        <Route path="/impossiblelevel" element={<ImpossibleLevel />} />
+
       </Routes>
 
       {showLoginModal && (

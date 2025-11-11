@@ -4,26 +4,26 @@ import { useState, useEffect } from "react";
 
 const sublevels = [
   {
-    name: "Easy 1",
-    description: "20 seconds, 1 line paragraph",
-    route: "/easylevel1",
+    name: "Hard 1",
+    description: "150 seconds, 20-25 lines paragraph",
+    route: "/hardlevel1",
     levelNumber: 1
   },
   {
-    name: "Easy 2",
-    description: "30 seconds, 2-3 lines paragraph",
-    route: "/easylevel2",
+    name: "Hard 2",
+    description: "180 seconds, 30-35 lines paragraph",
+    route: "/hardlevel2",
     levelNumber: 2
   },
   {
-    name: "Easy 3",
-    description: "45 seconds, 4-5 lines paragraph",
-    route: "/easylevel3",
+    name: "Hard 3",
+    description: "240 seconds, 40-50 lines paragraph",
+    route: "/hardlevel3",
     levelNumber: 3
   },
 ];
 
-export default function EasySublevels() {
+export default function HardSublevels() {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
 
@@ -48,27 +48,27 @@ export default function EasySublevels() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-700 to-yellow-900 text-white p-6 sm:p-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-700 to-red-900 text-white p-6 sm:p-8">
       <h1 className="text-3xl sm:text-4xl font-bold mb-10 drop-shadow-lg text-center w-full max-w-md px-2">
-        Easy Level — Select Your Sublevel
+        Hard Level — Select Your Sublevel
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl w-full px-2 sm:px-0">
         {sublevels.map(({ name, description, route, levelNumber }) => {
-          const levelProgress = progress?.easy?.[`level${levelNumber}`];
+          const levelProgress = progress?.hard?.[`level${levelNumber}`];
           const isCompleted = levelProgress?.completed;
           
           return (
             <div
               key={name}
               onClick={() => handleSublevelClick(route)}
-              className={`cursor-pointer rounded-xl shadow-2xl bg-yellow-400 text-blue-900 p-6 sm:p-8 flex flex-col justify-between
-                         transition-transform transform hover:scale-105 hover:shadow-yellow-400/80 relative
-                         ${isCompleted ? 'ring-4 ring-green-500 ring-opacity-50' : ''}`}
+              className={`cursor-pointer rounded-xl shadow-2xl bg-red-400 text-blue-900 p-6 sm:p-8 flex flex-col justify-between
+                         transition-transform transform hover:scale-105 hover:shadow-red-400/80 relative
+                         ${isCompleted ? 'ring-4 ring-red-500 ring-opacity-50' : ''}`}
               title={`Start ${name}`}
             >
               {/* Completion Badge */}
               {isCompleted && (
-                <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
                   ✅ COMPLETED
                 </div>
               )}
@@ -83,7 +83,7 @@ export default function EasySublevels() {
                 <div className="space-y-3">
                   {/* Completion Status */}
                   <div className={`text-center p-2 rounded-lg ${
-                    isCompleted ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
+                    isCompleted ? 'bg-red-500 text-white' : 'bg-blue-600 text-white'
                   }`}>
                     <div className="font-semibold">
                       {isCompleted ? '🎉 Completed!' : '🚀 Ready to Start'}
