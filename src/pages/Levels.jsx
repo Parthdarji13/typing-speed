@@ -54,7 +54,7 @@ export default function Levels() {
       name: "Impossible",
       description: "Only for typing masters! Complete all Easy, Medium, and Hard levels to unlock.",
       color: "from-purple-700 to-purple-900",
-      locked: true,
+      locked: false,
       difficulty: "impossible",
       totalLevels: 1
     },
