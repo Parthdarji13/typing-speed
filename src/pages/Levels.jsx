@@ -3,7 +3,7 @@ import { ProgressTracker } from "../utils/progressTracker";
 import { useState, useEffect } from "react";
 
 // ADMIN MODE: Set to true to unlock Impossible level for coding/editing
-const ADMIN_MODE_UNLOCK_IMPOSSIBLE = true;
+const ADMIN_MODE_UNLOCK_IMPOSSIBLE = false; // Set to false for production deployment
 
 export default function Levels() {
   const navigate = useNavigate();
