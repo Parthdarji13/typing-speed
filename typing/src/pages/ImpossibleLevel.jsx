@@ -46,25 +46,9 @@ export default function ImpossibleLevel() {
   const paragraph = "The quick brown fox jumps over the lazy dog. This is a longer sentence to practice typing skills. Learning to type faster takes time and practice. You need to focus on accuracy and speed. Keep practicing every day to improve your typing skills. The more you practice, the better you become at typing. Consistency is key to mastering any skill. Typing is an essential skill in today's digital world. Many jobs require fast and accurate typing abilities. Professional typists can type over 80 words per minute. Speed and accuracy both matter when typing. Practice makes perfect in everything you do. Technology has changed how we communicate and work. Computers are everywhere in modern life. Typing skills help you work more efficiently. Good typing habits include proper posture and finger placement. Regular practice will improve your typing speed and accuracy over time. The keyboard layout was designed to slow down typing to prevent jamming. Modern keyboards are much more efficient than old typewriters. Touch typing means typing without looking at the keyboard. This skill takes time to develop but is very valuable. Professional writers and programmers rely heavily on fast typing skills. Data entry jobs require excellent typing abilities. Many companies test typing speed during interviews. Typing tests measure both speed and accuracy. The average person types about 40 words per minute. Professional typists can reach 80 to 100 words per minute. Some people can type even faster with practice. Typing speed is measured in words per minute or WPM. Accuracy is just as important as speed when typing. Making fewer mistakes is better than typing faster with errors. The QWERTY keyboard layout was designed in the 1870s. It was created to prevent mechanical typewriter jams. Despite being designed to slow typing, it became the standard. Many people still use QWERTY keyboards today. Alternative layouts like Dvorak exist but are less common. Learning to touch type can significantly improve your speed. Touch typing involves using all ten fingers properly. Each finger is responsible for specific keys on the keyboard. The home row keys are ASDF for the left hand and JKL; for the right hand. Proper finger placement is crucial for efficient typing. Regular practice is essential to maintain and improve typing skills. Typing competitions exist around the world. Some people can type over 150 words per minute. The world record for typing speed is over 200 WPM. These incredible speeds require years of dedicated practice. Most people can improve their typing speed with regular practice. Setting goals helps motivate you to practice more. Tracking your progress shows how much you've improved. Typing games make practice more fun and engaging. Many online resources can help you learn to type faster. Free typing lessons are available on many websites. Some people prefer to learn typing through formal courses. Others learn by practicing with typing software. Whatever method you choose, consistency is the key to success. Typing is a skill that will benefit you throughout your life. In today's digital age, fast typing is more important than ever. Many jobs require computer skills including fast typing. Students need typing skills for school assignments and projects. Professionals use typing for emails, reports, and presentations. Even personal communication often involves typing messages and social media posts. The ability to type quickly and accurately saves time and reduces stress.";
 
   useEffect(() => {
-    // Check if user has completed all Easy, Medium, and Hard levels
-    const easyStats = ProgressTracker.getDifficultyStats('easy');
-    const mediumStats = ProgressTracker.getDifficultyStats('medium');
-    const hardStats = ProgressTracker.getDifficultyStats('hard');
-    
-    const allLevelsCompleted = easyStats?.percentage === 100 && 
-                             mediumStats?.percentage === 100 && 
-                             hardStats?.percentage === 100;
-    
-    if (!allLevelsCompleted) {
-      // Redirect to levels page if not all levels are completed
-      alert("Complete all Easy, Medium, and Hard levels to unlock the Impossible level!");
-      navigate("/levels");
-      return;
-    }
-    
     const t = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(t);
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (!started || finished) return;
@@ -86,12 +70,11 @@ export default function ImpossibleLevel() {
     const value = e.target.value;
     setUserInput(value);
 
-    // Normalize both strings to handle leading/trailing spaces and multiple spaces
+    // Normalize both strings
     const normalizedInput = value.trim().replace(/\s+/g, ' ');
     const normalizedParagraph = paragraph.trim().replace(/\s+/g, ' ');
 
     if (normalizedInput === normalizedParagraph) {
-      setTimeLeft(0);
       setIsFinishedTyping(true);
       setTimeout(() => endGame(value), 100);
     }
@@ -113,26 +96,14 @@ export default function ImpossibleLevel() {
     const normalizedInput = currentInput.trim().replace(/\s+/g, ' ');
     const normalizedParagraph = paragraph.trim().replace(/\s+/g, ' ');
     
-    console.log('🚀 EndGame called with:', {
-      currentInput: `"${currentInput}"`,
-      normalizedInput: `"${normalizedInput}"`,
-      normalizedParagraph: `"${normalizedParagraph}"`,
-      areEqual: normalizedInput === normalizedParagraph,
-      inputLength: normalizedInput.length,
-      paragraphLength: normalizedParagraph.length
-    });
-    
     let wordMistakes = 0;
     let correctChars = 0;
 
-    // Simple and bulletproof logic
     if (normalizedInput === normalizedParagraph) {
-      // Perfect match - absolutely no mistakes
+      // Perfect match
       wordMistakes = 0;
       correctChars = normalizedInput.length;
-      console.log('✅ Perfect match detected - 0 mistakes');
     } else {
-      // Only calculate if there are actual differences
       const typedWords = normalizedInput.split(' ').filter(w => w.length > 0);
       const originalWords = normalizedParagraph.split(' ').filter(w => w.length > 0);
       
@@ -158,32 +129,19 @@ export default function ImpossibleLevel() {
     const wpm = Math.round((correctChars / 5) / (elapsedSec / 60));
     const accuracy = typedChars > 0 ? ((correctChars / typedChars) * 100).toFixed(1) : "0.0";
      
-    // Enhanced conditions for next level unlock
+    // Completion conditions
     const hasCompletedParagraph = normalizedInput === normalizedParagraph;
-    const hasGoodSpeed = wpm >= 80; // Very high speed requirement for impossible level
-    const hasGoodAccuracy = parseFloat(accuracy) >= 95; // Very high accuracy requirement
-    const hasLowMistakes = wordMistakes <= 20; // Allow more mistakes for very long text
+    const hasGoodSpeed = wpm >= 80;
+    const hasGoodAccuracy = parseFloat(accuracy) >= 95;
+    const hasLowMistakes = wordMistakes <= 20;
     const hasFinishedInTime = isFinishedTyping || timeLeft > 0;
     
-    // All conditions must be met to unlock next level
     const isCompleted = hasCompletedParagraph && hasGoodSpeed && hasGoodAccuracy && hasLowMistakes && hasFinishedInTime;
-    
-    // Debug logging
-    console.log('🔍 Completion check:', {
-      normalizedInput: `"${normalizedInput}"`,
-      normalizedParagraph: `"${normalizedParagraph}"`,
-      areEqual: normalizedInput === normalizedParagraph,
-      hasCompletedParagraph,
-      isFinishedTyping,
-      timeLeft,
-      hasFinishedInTime,
-      isCompleted
-    });
     
     let message = "💪 Keep practicing to improve!";
     let detailedFeedback = [];
     
-    // Check each condition and provide specific feedback
+    // Detailed feedback
     if (!hasCompletedParagraph) {
       detailedFeedback.push("❌ Complete the full paragraph");
     } else {
@@ -219,26 +177,26 @@ export default function ImpossibleLevel() {
     }
      
     if (isCompleted) {
-        message = "🎉 IMPOSSIBLE LEVEL COMPLETED! You are a typing master!";
-                 ProgressTracker.completeLevel('impossible', 1, {
-           wpm,
-           accuracy: parseFloat(accuracy),
-           mistakes: wordMistakes,
-           timeRemaining: timeLeft
-         });
+      message = "🎉 IMPOSSIBLE LEVEL COMPLETED! You are a typing master!";
+      ProgressTracker.completeLevel('impossible', 1, {
+        wpm,
+        accuracy: parseFloat(accuracy),
+        mistakes: wordMistakes,
+        timeRemaining: timeLeft
+      });
     } else if (hasCompletedParagraph) {
-        const passedConditions = [hasGoodSpeed, hasGoodAccuracy, hasLowMistakes, hasFinishedInTime].filter(Boolean).length;
-        if (passedConditions >= 3) {
-          message = "🔥 Almost there! Check requirements below.";
-        } else {
-          message = "📈 Good progress! Work on the highlighted areas.";
-        }
+      const passedConditions = [hasGoodSpeed, hasGoodAccuracy, hasLowMistakes, hasFinishedInTime].filter(Boolean).length;
+      if (passedConditions >= 3) {
+        message = "🔥 Almost there! Check requirements below.";
+      } else {
+        message = "📈 Good progress! Work on the highlighted areas.";
+      }
     } else if (wpm >= 150) {
-        message = "🚀 Incredible speed!";
+      message = "🚀 Incredible speed!";
     } else if (wpm >= 120) {
-        message = "⚡ Amazing speed!";
+      message = "⚡ Amazing speed!";
     } else if (wpm >= 80) {
-        message = "🙂 Great start — keep going!";
+      message = "🙂 Great start — keep going!";
     }
 
     setResults({
@@ -253,7 +211,7 @@ export default function ImpossibleLevel() {
         accuracy: { required: 95, achieved: parseFloat(accuracy), passed: hasGoodAccuracy },
         mistakes: { required: 20, achieved: wordMistakes, passed: hasLowMistakes },
         completion: { required: true, achieved: hasCompletedParagraph, passed: hasCompletedParagraph },
-        time: { required: true, achieved: timeLeft > 0, passed: hasFinishedInTime }
+        time: { required: true, achieved: timeLeft > 0 || isFinishedTyping, passed: hasFinishedInTime }
       }
     });
   };
@@ -291,11 +249,7 @@ export default function ImpossibleLevel() {
             return (
               <span
                 key={idx}
-                title={
-                  isCorrect
-                    ? ""
-                    : `You typed: "${typedWord || "[missing]"}"`
-                }
+                title={isCorrect ? "" : `You typed: "${typedWord || "[missing]"}"`}
                 style={{
                   backgroundColor: isCorrect ? "transparent" : "#ffe6e6",
                   borderRadius: "4px",
@@ -305,9 +259,7 @@ export default function ImpossibleLevel() {
                   padding: isCorrect ? "0" : "2px 4px",
                 }}
               >
-                {isCorrect
-                  ? word
-                  : highlightWordDiff(word, typedWord)}
+                {isCorrect ? word : highlightWordDiff(word, typedWord)}
               </span>
             );
           })}
@@ -393,7 +345,7 @@ export default function ImpossibleLevel() {
                 </div>
               </div>
 
-              {/* Next Level Requirements */}
+              {/* Requirements */}
               <div className="mb-4 p-4 bg-gray-50 rounded-lg">
                 <h3 className="font-semibold mb-2 text-gray-700">📋 Impossible Level Requirements:</h3>
                 <div className="space-y-1 text-sm">

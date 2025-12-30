@@ -97,6 +97,9 @@ function AppWrapper() {
         {/* Impossible level page */}
         <Route path="/impossiblelevel" element={<ImpossibleLevel />} />
 
+        {/* DEV: Direct route for testing Impossible level */}
+        <Route path="/dev-impossible" element={<ImpossibleLevel />} />
+
       </Routes>
 
       {showLoginModal && (
