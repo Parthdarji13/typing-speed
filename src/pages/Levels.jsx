@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { ProgressTracker } from "../utils/progressTracker";
 import { useState, useEffect } from "react";
 
+// ADMIN MODE: Set to true to unlock Impossible level for coding/editing
+const ADMIN_MODE_UNLOCK_IMPOSSIBLE = true;
+
 export default function Levels() {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
@@ -57,9 +60,10 @@ export default function Levels() {
     },
   ];
 
-  const handleClick = (name, locked) => {
-    if (locked) {
-      if (name === "Impossible") {
+  const handleLevelClick = (levelName, isLocked) => {
+    // Check if level is locked
+    if (isLocked) {
+      if (levelName === "Impossible") {
         alert("Complete all Easy, Medium, and Hard levels to unlock the Impossible level!");
       } else {
         alert("This level is locked. Complete previous levels first!");
@@ -67,16 +71,36 @@ export default function Levels() {
       return;
     }
 
-    // Navigate to the correct sublevel page
-    if (name === "Easy") {
-      navigate("/levels/easy");
-    } else if (name === "Medium") {
-      navigate("/levels/medium");
-    } else if (name === "Hard") {
-      navigate("/levels/hard");
-    } else if (name === "Impossible") {
-      navigate("/impossiblelevel");
+    // Navigate to the appropriate level page
+    const routeMap = {
+      "Easy": "/levels/easy",
+      "Medium": "/levels/medium",
+      "Hard": "/levels/hard",
+      "Impossible": "/impossiblelevel"
+    };
+
+    navigate(routeMap[levelName]);
+  };
+
+  // Helper function to check if Impossible level should be unlocked
+  const isImpossibleLevelUnlocked = () => {
+    // Admin mode always unlocks
+    if (ADMIN_MODE_UNLOCK_IMPOSSIBLE) {
+      return true;
     }
+
+    // Check if all other difficulties are completed
+    if (!progress) return false;
+
+    const easyStats = ProgressTracker.getDifficultyStats("easy");
+    const mediumStats = ProgressTracker.getDifficultyStats("medium");
+    const hardStats = ProgressTracker.getDifficultyStats("hard");
+
+    return (
+      easyStats?.percentage === 100 &&
+      mediumStats?.percentage === 100 &&
+      hardStats?.percentage === 100
+    );
   };
 
   return (
@@ -85,24 +109,15 @@ export default function Levels() {
         Select Your Level
       </h1>
       
-      
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 max-w-6xl w-full px-2 sm:px-0">
         {levels.map(({ name, description, color, locked, difficulty, totalLevels }) => {
           // Get progress for this difficulty
           const difficultyStats = progress ? ProgressTracker.getDifficultyStats(difficulty) : null;
           
-          // Check if Impossible level should be unlocked
+          // Determine if this level is locked
           let isLocked = locked;
-          if (difficulty === 'impossible' && progress) {
-            const easyStats = ProgressTracker.getDifficultyStats('easy');
-            const mediumStats = ProgressTracker.getDifficultyStats('medium');
-            const hardStats = ProgressTracker.getDifficultyStats('hard');
-            
-            // Unlock Impossible only if ALL Easy, Medium, and Hard levels are 100% complete
-            const allLevelsCompleted = easyStats?.percentage === 100 && 
-                                     mediumStats?.percentage === 100 && 
-                                     hardStats?.percentage === 100;
-            isLocked = !allLevelsCompleted;
+          if (difficulty === "impossible") {
+            isLocked = !isImpossibleLevelUnlocked();
           }
           
           return (
@@ -112,14 +127,21 @@ export default function Levels() {
               transition-all duration-300 transform hover:scale-105 hover:shadow-yellow-400/80
               ${isLocked ? "opacity-60 cursor-not-allowed grayscale" : "opacity-100 hover:shadow-2xl"}`}
               title={isLocked ? (name === "Impossible" ? "Complete all Easy, Medium, and Hard levels to unlock" : "Complete previous levels to unlock") : `${name} Level`}
-              onClick={() => handleClick(name, isLocked)}
+              onClick={() => handleLevelClick(name, isLocked)}
             >
-               {isLocked && (
-                 <div className="absolute top-3 right-3 bg-black bg-opacity-80 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full z-10 select-none border border-yellow-400/50">
-                   🔒 LOCKED
-                 </div>
-               )}
- 
+              {isLocked && (
+                <div className="absolute top-3 right-3 bg-black bg-opacity-80 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full z-10 select-none border border-yellow-400/50">
+                  🔒 LOCKED
+                </div>
+              )}
+              
+              {/* Admin Mode Indicator */}
+              {difficulty === 'impossible' && ADMIN_MODE_UNLOCK_IMPOSSIBLE && !isLocked && (
+                <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10 select-none border-2 border-green-300 shadow-lg">
+                  🔓 ADMIN MODE
+                </div>
+              )}
+
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold mb-3 drop-shadow-md text-gray-800">{name}</h2>
                 <p className="text-sm opacity-90 mb-4 text-gray-700">{description}</p>
@@ -145,14 +167,15 @@ export default function Levels() {
                 
                 {/* Best Performance for this difficulty */}
                 {difficultyStats && difficultyStats.levels && (() => {
-                  const bestWpm = Math.max(...Object.values(difficultyStats.levels)
-                    .filter(level => level.completed)
-                    .map(level => level.bestWpm));
-                  return bestWpm > 0 ? (
+                  const completedLevels = Object.values(difficultyStats.levels).filter(level => level.completed);
+                  if (completedLevels.length === 0) return null;
+                  
+                  const bestWpm = Math.max(...completedLevels.map(level => level.bestWpm));
+                  return (
                     <div className="text-xs text-center bg-white bg-opacity-30 rounded-lg p-2 border border-white border-opacity-40">
                       <div className="font-semibold text-gray-800 mb-1">🏆 Best: {bestWpm} WPM</div>
                     </div>
-                  ) : null;
+                  );
                 })()}
                 
                 {/* Impossible Level Unlock Progress */}
