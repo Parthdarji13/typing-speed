@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import crypto from "crypto";
-import { getFirebaseAdmin } from "./firebaseAdmin.js";
 import { createMailer } from "./email.js";
 
 dotenv.config();

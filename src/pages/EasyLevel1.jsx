@@ -43,7 +43,7 @@ export default function EasyLevel1() {
 
   const textareaRef = useRef(null);
   const navigate = useNavigate();
-  const paragraph = "The quick brown fox jumps over the lazy dog."; // FIXED: Added the period
+  const paragraph = "The quick brown fox jumps over the lazy dog.";
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 2000);
@@ -77,12 +77,11 @@ export default function EasyLevel1() {
     if (normalizedInput === normalizedParagraph) {
       setTimeLeft(0);
       setIsFinishedTyping(true);
-      // FIXED: Pass the current value to endGame to avoid state timing issues
       setTimeout(() => endGame(value), 100);
     }
   };
 
-  const endGame = (inputValue = userInput) => { // FIXED: Accept input parameter
+  const endGame = (inputValue = userInput) => {
     if (finished) return;
     setFinished(true);
     textareaRef.current?.blur();
@@ -92,7 +91,6 @@ export default function EasyLevel1() {
       ? Math.max(1, startTime ? (endTime - startTime) / 1000 : 1)
       : Math.max(1, startTime ? (20 - timeLeft) : 1);
 
-    // FIXED: Use the passed inputValue instead of userInput state
     const currentInput = inputValue;
     
     // Normalize both strings for comparison
@@ -145,11 +143,13 @@ export default function EasyLevel1() {
     const accuracy = typedChars > 0 ? ((correctChars / typedChars) * 100).toFixed(1) : "0.0";
      
     // Enhanced conditions for next level unlock
-    const hasCompletedParagraph = normalizedInput === normalizedParagraph; // FIXED: Check actual completion instead of state
-    const hasGoodSpeed = wpm >= 20; // Increased minimum speed
-    const hasGoodAccuracy = parseFloat(accuracy) >= 85; // Increased minimum accuracy
+    const hasCompletedParagraph = normalizedInput === normalizedParagraph;
+    const hasGoodSpeed = wpm >= 20;
+    const hasGoodAccuracy = parseFloat(accuracy) >= 85;
     const hasLowMistakes = wordMistakes <= 2; // Maximum 2 word mistakes allowed
-    const hasFinishedInTime = isFinishedTyping || timeLeft > 0; // FIXED: User either finished early OR has time left
+    
+    // FIXED: If paragraph is completed, user finished in time (even if timer shows 0)
+    const hasFinishedInTime = hasCompletedParagraph || timeLeft > 0;
     
     // All conditions must be met to unlock next level
     const isCompleted = hasCompletedParagraph && hasGoodSpeed && hasGoodAccuracy && hasLowMistakes && hasFinishedInTime;
@@ -163,6 +163,8 @@ export default function EasyLevel1() {
       isFinishedTyping,
       timeLeft,
       hasFinishedInTime,
+      wordMistakes,
+      hasLowMistakes,
       isCompleted
     });
     
@@ -206,7 +208,7 @@ export default function EasyLevel1() {
      
     if (isCompleted) {
         message = "🎉 Level Completed! All requirements met!";
-                 ProgressTracker.completeLevel('easy', 1, {
+        ProgressTracker.completeLevel('easy', 1, {
            wpm,
            accuracy: parseFloat(accuracy),
            mistakes: wordMistakes,
@@ -232,7 +234,7 @@ export default function EasyLevel1() {
       accuracy,
       mistakes: wordMistakes,
       message,
-      detailedFeedback, // Add detailed feedback to results
+      detailedFeedback,
       isCompleted,
       requirements: {
         speed: { required: 20, achieved: wpm, passed: hasGoodSpeed },
