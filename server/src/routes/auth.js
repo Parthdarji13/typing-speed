@@ -1,4 +1,17 @@
+import express from "express";
+import bcrypt from "bcryptjs";
+import User from "../models/User.js";
+import { sendCredentialsEmail } from "../email.js";
+
+const router = express.Router();
+
+function randomString(length = 8) {
+  return Math.random().toString(36).slice(-length);
+}
+
 router.post("/register", async (req, res) => {
+  console.log("🔥 NEW REGISTER ROUTE HIT");
+
   try {
     const { name, email } = req.body;
 
@@ -17,7 +30,6 @@ router.post("/register", async (req, res) => {
     const plainPassword = randomString(10);
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
-    // 1️⃣ SAVE USER (MAIN SUCCESS)
     await User.create({
       name,
       email,
@@ -25,22 +37,55 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
     });
 
-    // 2️⃣ SEND RESPONSE IMMEDIATELY
+    // respond immediately
     res.status(201).json({
       message: "Registration successful. Credentials will be sent to your email.",
     });
 
-    // 3️⃣ SEND EMAIL IN BACKGROUND (NON-BLOCKING)
+    // send email in background
     sendCredentialsEmail(email, username, plainPassword)
-      .then(() => {
-        console.log("📧 Credentials email sent to", email);
-      })
-      .catch((err) => {
-        console.error("❌ Email sending failed:", err.message);
-      });
+      .then(() => console.log("📧 Email sent"))
+      .catch((err) => console.error("❌ Email error:", err.message));
 
-  } catch (error) {
-    console.error("REGISTER ERROR:", error);
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
     res.status(500).json({ error: "Registration failed" });
   }
 });
+
+router.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const user = await User.findOne({
+      $or: [{ username }, { email: username }],
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const ok = await bcrypt.compare(password, user.password);
+    if (!ok) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    res.json({
+      message: "Login successful",
+      user: {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    res.status(500).json({ error: "Login failed" });
+  }
+});
+
+export default router;
