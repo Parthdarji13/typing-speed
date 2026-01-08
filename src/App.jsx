@@ -68,7 +68,16 @@ function AppWrapper() {
         <Route path="/about" element={<About />} />
 
         {/* Levels route - accessible to all users */}
-        <Route path="/levels" element={<Levels />} />
+<Route
+  path="/levels"
+  element={
+    isLoggedIn ? (
+      <Levels />
+    ) : (
+      <Navigate to="/" replace />
+    )
+  }
+/>
 
         {/* Easy Sublevels route - accessible to all users */}
         <Route path="/levels/easy" element={<EasySublevels />} />

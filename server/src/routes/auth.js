@@ -5,7 +5,8 @@ import { sendCredentialsEmail } from "../email.js";
 
 const router = express.Router();
 
-function randomString(length = 8) {
+// random string generator
+function randomString(length = 6) {
   return Math.random().toString(36).slice(-length);
 }
 
@@ -27,7 +28,10 @@ router.post("/register", async (req, res) => {
     const username =
       name.toLowerCase().replace(/\s+/g, "") + randomString(4);
 
-    const plainPassword = randomString(10);
+    // ✅ 6-character user password
+    const plainPassword = randomString(6);
+
+    // ✅ secure hashing (do NOT reduce this)
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     await User.create({
@@ -42,9 +46,8 @@ router.post("/register", async (req, res) => {
       message: "Registration successful. Credentials will be sent to your email.",
     });
 
-    // send email in background
-sendCredentialsEmail(email, username, plainPassword);
-
+    // fire-and-forget email
+    sendCredentialsEmail(email, username, plainPassword);
 
   } catch (err) {
     console.error("REGISTER ERROR:", err);

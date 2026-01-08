@@ -229,6 +229,26 @@ export default function EasyLevel1() {
         message = "🙂 Nice start — keep going!";
     }
 
+    // 🔹 SEND RESULT TO BACKEND (STEP 3.1)
+fetch(
+  `${import.meta.env.VITE_API_URL || "http://localhost:4000"}/test/result`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      level: "easy-1",
+      wpm,
+      accuracy: parseFloat(accuracy),
+      mistakes: wordMistakes,
+    }),
+  }
+).catch(() => {
+  // ignore errors for now
+});
+
+
     setResults({
       wpm,
       accuracy,

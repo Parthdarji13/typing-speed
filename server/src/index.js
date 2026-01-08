@@ -41,6 +41,31 @@ app.get("/health", (req, res) => {
 	});
 });
 
+app.get("/test-email", async (req, res) => {
+  try {
+    const { sendCredentialsEmail } = await import("./email.js");
+
+    await sendCredentialsEmail(
+      "pnd61430@gmail.com",
+      "testuser",
+      "test123"
+    );
+
+    res.json({ message: "Test email sent successfully" });
+  } catch (err) {
+    console.error("EMAIL TEST ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+app.post("/test/result", (req, res) => {
+  console.log("📊 Typing Result Received:", req.body);
+  res.json({ ok: true });
+});
+
+
 // Start server
 async function startServer() {
 	await connectMongoDB();
