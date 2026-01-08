@@ -1,3 +1,4 @@
+import authRoutes from "./routes/auth.js";
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -11,6 +12,9 @@ const PORT = process.env.PORT || 4000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.use("/auth", authRoutes);
+
 
 // MongoDB connection
 async function connectMongoDB() {
@@ -41,9 +45,10 @@ app.get("/health", (req, res) => {
 async function startServer() {
 	await connectMongoDB();
 
-	app.listen(PORT, () => {
-		console.log(`🚀 Server running on port ${PORT}`);
-	});
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
 }
 
 startServer();
