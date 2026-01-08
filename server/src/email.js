@@ -1,18 +1,21 @@
 import nodemailer from "nodemailer";
 
-export function sendCredentialsEmail(to, username, password) {
-  try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT), // 🔥 force number
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+  connectionTimeout: 10_000, // 10 seconds
+  greetingTimeout: 10_000,
+  socketTimeout: 10_000,
+});
 
-    transporter.sendMail({
+export async function sendCredentialsEmail(to, username, password) {
+  try {
+    await transporter.sendMail({
       from: process.env.FROM_EMAIL,
       to,
       subject: "Your Typing Speed Account Credentials",
@@ -25,7 +28,7 @@ export function sendCredentialsEmail(to, username, password) {
       `,
     });
   } catch (err) {
-    // 🔥 NEVER crash registration because of email
-    console.error("❌ Email failed (ignored):", err.message);
+    // 🔥 CRITICAL: swallow email errors
+    console.error("EMAIL SEND FAILED:", err.message);
   }
 }
