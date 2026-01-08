@@ -43,9 +43,8 @@ router.post("/register", async (req, res) => {
     });
 
     // send email in background
-    sendCredentialsEmail(email, username, plainPassword)
-      .then(() => console.log("📧 Email sent"))
-      .catch((err) => console.error("❌ Email error:", err.message));
+sendCredentialsEmail(email, username, plainPassword);
+
 
   } catch (err) {
     console.error("REGISTER ERROR:", err);
