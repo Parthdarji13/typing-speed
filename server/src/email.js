@@ -1,34 +1,34 @@
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10_000, // 10 seconds
-  greetingTimeout: 10_000,
-  socketTimeout: 10_000,
-});
+import fetch from "node-fetch";
 
 export async function sendCredentialsEmail(to, username, password) {
-  try {
-    await transporter.sendMail({
-      from: process.env.FROM_EMAIL,
-      to,
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "accept": "application/json",
+      "content-type": "application/json",
+      "api-key": process.env.BREVO_API_KEY,
+    },
+    body: JSON.stringify({
+      sender: {
+        name: process.env.FROM_NAME || "Typing Speed Challenge",
+        email: process.env.FROM_EMAIL,
+      },
+      to: [{ email: to }],
       subject: "Your Typing Speed Account Credentials",
-      html: `
+      htmlContent: `
         <h2>Welcome to Typing Speed Challenge 🎯</h2>
-        <p>Your account has been created.</p>
+        <p>Your account has been created successfully.</p>
         <p><b>Username:</b> ${username}</p>
         <p><b>Password:</b> ${password}</p>
         <p>Please keep this information safe.</p>
       `,
-    });
-  } catch (err) {
-    // 🔥 CRITICAL: swallow email errors
-    console.error("EMAIL SEND FAILED:", err.message);
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Brevo API error: ${err}`);
   }
+
+  return true;
 }
