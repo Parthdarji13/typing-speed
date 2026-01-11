@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import LoginModal from "./components/LoginModal";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -23,7 +24,25 @@ import ImpossibleLevel from "./pages/ImpossibleLevel";
 function AppWrapper() {
   const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Initialize isLoggedIn and currentUser from localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const savedLoginState = localStorage.getItem('isLoggedIn');
+    return savedLoginState === 'true';
+  });
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        return user.username || user.email || null;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  });
+
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -32,15 +51,35 @@ function AppWrapper() {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setCurrentUser(null);
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
+    // Note: We keep the user's progress stored with their username
+    // so when they login again, they get their progress back
     setToastMsg("Logged out successfully!");
     setShowToast(true);
     navigate("/");
   };
 
   const handleLoginSuccess = () => {
+    // Get the newly logged in user
+    let username = null;
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        username = user.username || user.email;
+        setCurrentUser(username);
+        console.log('✅ User logged in:', username);
+      }
+    } catch (error) {
+      console.error('Error getting user:', error);
+    }
+
     setIsLoggedIn(true);
+    localStorage.setItem('isLoggedIn', 'true');
     setShowLoginModal(false);
-    setToastMsg("Login successful! Welcome back!");
+    setToastMsg(`Login successful! Welcome back${username ? ', ' + username : ''}!`);
     setShowToast(true);
     navigate("/levels");
   };
@@ -60,56 +99,69 @@ function AppWrapper() {
         onLogout={handleLogout}
       />
 
-      <Routes>
-        <Route
-          path="/"
-          element={<Home onStartChallengeClick={handleLoginClick} />}
-        />
-        <Route path="/about" element={<About />} />
+      <div className="flex flex-col min-h-screen">
+        <div className="flex-grow">
+          <Routes>
+            {/* Home route - redirects logged in users to /levels */}
+            <Route
+              path="/"
+              element={
+                isLoggedIn ? (
+                  <Navigate to="/levels" replace />
+                ) : (
+                  <Home onStartChallengeClick={handleLoginClick} />
+                )
+              }
+            />
+            <Route path="/about" element={<About />} />
 
-        {/* Levels route - accessible to all users */}
-<Route
-  path="/levels"
-  element={
-    isLoggedIn ? (
-      <Levels />
-    ) : (
-      <Navigate to="/" replace />
-    )
-  }
-/>
+            {/* Levels route - accessible only to logged in users */}
+            <Route
+              path="/levels"
+              element={
+                isLoggedIn ? (
+                  <Levels onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
 
-        {/* Easy Sublevels route - accessible to all users */}
-        <Route path="/levels/easy" element={<EasySublevels />} />
+            {/* Easy Sublevels route - accessible to all users */}
+            <Route path="/levels/easy" element={<EasySublevels />} />
 
-        {/* Medium Sublevels route - accessible to all users */}
-        <Route path="/levels/medium" element={<MediumSublevels />} />
+            {/* Medium Sublevels route - accessible to all users */}
+            <Route path="/levels/medium" element={<MediumSublevels />} />
 
-        {/* Hard Sublevels route - accessible to all users */}
-        <Route path="/levels/hard" element={<HardSublevels />} />
+            {/* Hard Sublevels route - accessible to all users */}
+            <Route path="/levels/hard" element={<HardSublevels />} />
 
-        {/* Easy sublevel pages */}
-        <Route path="/easylevel1" element={<EasyLevel1 />} />
-        <Route path="/easylevel2" element={<EasyLevel2 />} />
-        <Route path="/easylevel3" element={<EasyLevel3 />} />
+            {/* Easy sublevel pages */}
+            <Route path="/easylevel1" element={<EasyLevel1 />} />
+            <Route path="/easylevel2" element={<EasyLevel2 />} />
+            <Route path="/easylevel3" element={<EasyLevel3 />} />
 
-        {/* Medium sublevel pages */}
-        <Route path="/mediumlevel1" element={<MediumLevel1 />} />
-        <Route path="/mediumlevel2" element={<MediumLevel2 />} />
-        <Route path="/mediumlevel3" element={<MediumLevel3 />} />
+            {/* Medium sublevel pages */}
+            <Route path="/mediumlevel1" element={<MediumLevel1 />} />
+            <Route path="/mediumlevel2" element={<MediumLevel2 />} />
+            <Route path="/mediumlevel3" element={<MediumLevel3 />} />
 
-        {/* Hard sublevel pages */}
-        <Route path="/hardlevel1" element={<HardLevel1 />} />
-        <Route path="/hardlevel2" element={<HardLevel2 />} />
-        <Route path="/hardlevel3" element={<HardLevel3 />} />
+            {/* Hard sublevel pages */}
+            <Route path="/hardlevel1" element={<HardLevel1 />} />
+            <Route path="/hardlevel2" element={<HardLevel2 />} />
+            <Route path="/hardlevel3" element={<HardLevel3 />} />
 
-        {/* Impossible level page */}
-        <Route path="/impossiblelevel" element={<ImpossibleLevel />} />
+            {/* Impossible level page */}
+            <Route path="/impossiblelevel" element={<ImpossibleLevel />} />
 
-        {/* DEV: Direct route for testing Impossible level */}
-        <Route path="/dev-impossible" element={<ImpossibleLevel />} />
+            {/* DEV: Direct route for testing Impossible level */}
+            <Route path="/dev-impossible" element={<ImpossibleLevel />} />
 
-      </Routes>
+          </Routes>
+        </div>
+
+        <Footer />
+      </div>
 
       {showLoginModal && (
         <LoginModal

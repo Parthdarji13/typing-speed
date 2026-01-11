@@ -5,19 +5,19 @@ import { useState, useEffect } from "react";
 const sublevels = [
   {
     name: "Medium 1",
-    description: "60 seconds, 6-8 lines paragraph",
+    description: "60 seconds, 3-4 lines paragraph",
     route: "/mediumlevel1",
     levelNumber: 1
   },
   {
     name: "Medium 2",
-    description: "90 seconds, 10-12 lines paragraph",
+    description: "90 seconds, 6 lines paragraph",
     route: "/mediumlevel2",
     levelNumber: 2
   },
   {
     name: "Medium 3",
-    description: "120 seconds, 15-18 lines paragraph",
+    description: "120 seconds, 8 lines paragraph",
     route: "/mediumlevel3",
     levelNumber: 3
   },

@@ -5,19 +5,19 @@ import { useState, useEffect } from "react";
 const sublevels = [
   {
     name: "Hard 1",
-    description: "150 seconds, 20-25 lines paragraph",
+    description: "150 seconds, 10-11 lines paragraph",
     route: "/hardlevel1",
     levelNumber: 1
   },
   {
     name: "Hard 2",
-    description: "180 seconds, 30-35 lines paragraph",
+    description: "180 seconds, 13-14 lines paragraph",
     route: "/hardlevel2",
     levelNumber: 2
   },
   {
     name: "Hard 3",
-    description: "240 seconds, 40-50 lines paragraph",
+    description: "240 seconds, 19-20 lines paragraph",
     route: "/hardlevel3",
     levelNumber: 3
   },

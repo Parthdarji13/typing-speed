@@ -4,12 +4,18 @@ import { ProgressTracker } from '../utils/progressTracker';
 export default function ProgressDashboard({ compact = false }) {
   const [progress, setProgress] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const loadProgress = () => {
       const currentProgress = ProgressTracker.getProgress();
       setProgress(currentProgress);
       setRecentActivity(ProgressTracker.getRecentActivity().slice(0, compact ? 2 : 5));
+      
+      // Get current username
+      const username = ProgressTracker.getCurrentUser();
+      console.log('🔍 ProgressDashboard - Username:', username);
+      setCurrentUser(username);
     };
     
     loadProgress();
@@ -96,6 +102,16 @@ export default function ProgressDashboard({ compact = false }) {
                 {activity.difficulty} {activity.level} - {activity.wpm} WPM
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Username Display - Above Logout */}
+      {currentUser && (
+        <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+          <div className="mb-2">
+            <div className="text-xs text-gray-500 font-medium mb-1">Logged in as</div>
+            <div className="text-lg font-bold text-blue-600">@{currentUser}</div>
           </div>
         </div>
       )}

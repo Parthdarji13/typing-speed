@@ -3,9 +3,9 @@ import { ProgressTracker } from "../utils/progressTracker";
 import { useState, useEffect } from "react";
 
 // ADMIN MODE: Set to true to unlock Impossible level for coding/editing
-const ADMIN_MODE_UNLOCK_IMPOSSIBLE = true; // Set to false for production deployment
+const ADMIN_MODE_UNLOCK_IMPOSSIBLE = false; // Set to false for production deployment
 
-export default function Levels() {
+export default function Levels({ onLogout }) {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(null);
 
@@ -24,6 +24,40 @@ export default function Levels() {
     
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Prevent accidental back navigation with confirmation
+  useEffect(() => {
+    const handlePopState = (e) => {
+      e.preventDefault();
+      
+      const confirmLeave = window.confirm(
+        "Are you sure you want to leave? You'll be logged out if you go back to the home page."
+      );
+      
+      if (confirmLeave) {
+        // User wants to leave - trigger logout
+        if (onLogout) {
+          onLogout();
+        } else {
+          // Fallback if onLogout not provided
+          navigate("/");
+        }
+      } else {
+        // Stay on current page
+        window.history.pushState(null, '', window.location.pathname);
+      }
+    };
+
+    // Push initial state to enable back button detection
+    window.history.pushState(null, '', window.location.pathname);
+    
+    // Listen for back/forward button
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [navigate, onLogout]);
 
   const levels = [
     {
@@ -54,7 +88,7 @@ export default function Levels() {
       name: "Impossible",
       description: "Only for typing masters! Complete all Easy, Medium, and Hard levels to unlock.",
       color: "from-purple-700 to-purple-900",
-      locked: false,
+      locked: true,
       difficulty: "impossible",
       totalLevels: 1
     },
@@ -138,7 +172,7 @@ export default function Levels() {
               {/* Admin Mode Indicator */}
               {difficulty === 'impossible' && ADMIN_MODE_UNLOCK_IMPOSSIBLE && !isLocked && (
                 <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10 select-none border-2 border-green-300 shadow-lg">
-                  🔓 ADMIN MODE
+                  🔓  MODE
                 </div>
               )}
 

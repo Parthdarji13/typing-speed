@@ -43,7 +43,7 @@ export default function MediumLevel2() {
 
   const textareaRef = useRef(null);
   const navigate = useNavigate();
-  const paragraph = "The quick brown fox jumps over the lazy dog. This is a longer sentence to practice typing skills. Learning to type faster takes time and practice. You need to focus on accuracy and speed. Keep practicing every day to improve your typing skills. The more you practice, the better you become at typing. Consistency is key to mastering any skill. Typing is an essential skill in today's digital world. Many jobs require fast and accurate typing abilities.";
+  const paragraph = "The quick brown fox jumps over the lazy dog. This is a longer sentence to practice typing skills. Learning to type faster takes time and practice. You need to focus on accuracy and speed. Keep practicing every day to improve your typing skills. The more you practice, the better you become at typing. Consistency is key to mastering any skill. Typing is an essential skill in today's digital world. Many jobs require fast and accurate typing abilities. ";
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 2000);
@@ -409,7 +409,7 @@ export default function MediumLevel2() {
               <div className="mt-6 flex justify-center gap-4">
                 {results.isCompleted ? (
                   <button
-                    onClick={() => navigate("/Mediumsublevels")}
+                    onClick={() => navigate("/Mediumlevel3")}
                     className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition"
                   >
                     Next Level →

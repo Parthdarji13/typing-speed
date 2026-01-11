@@ -6,6 +6,7 @@ export default function Navbar({ isLoggedIn, onLoginClick, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [progress, setProgress] = useState(null);
   const [overallProgress, setOverallProgress] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const avatarUrl = "https://i.pravatar.cc/40";
 
@@ -15,6 +16,10 @@ export default function Navbar({ isLoggedIn, onLoginClick, onLogout }) {
         const currentProgress = ProgressTracker.getProgress();
         setProgress(currentProgress);
         setOverallProgress(ProgressTracker.getCompletionPercentage());
+        
+        // Get current username
+        const username = ProgressTracker.getCurrentUser();
+        setCurrentUser(username);
       };
       
       loadProgress();
@@ -35,7 +40,7 @@ export default function Navbar({ isLoggedIn, onLoginClick, onLogout }) {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <div className="flex-shrink-0 text-2xl font-extrabold tracking-wide cursor-pointer select-none">
-            Typing <span className="text-yellow-400">Speed</span>
+            Type<span className="text-yellow-400">Rush</span>
           </div>
 
           {/* Desktop Menu */}
@@ -131,12 +136,22 @@ export default function Navbar({ isLoggedIn, onLoginClick, onLogout }) {
       </div>
     )}
     
+    {/* Username Display - Above Logout */}
+    {currentUser && (
+      <div className="px-4 py-3 bg-blue-50 border-b border-blue-200">
+        <div className="text-center">
+          <div className="text-xs text-gray-500 font-medium mb-1">Logged in as</div>
+          <div className="text-lg font-bold text-blue-700">@{currentUser}</div>
+        </div>
+      </div>
+    )}
+    
     <button
       onClick={() => {
         setShowProfileMenu(false);
         onLogout();
       }}
-      className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100 transition-colors duration-200"
+      className="block w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200 font-semibold"
     >
       Logout
     </button>
@@ -269,12 +284,20 @@ export default function Navbar({ isLoggedIn, onLoginClick, onLogout }) {
     </div>
   )}
   
+  {/* Mobile Username Display - Above Logout */}
+  {currentUser && (
+    <div className="mb-3 p-3 bg-white bg-opacity-10 rounded-lg text-center">
+      <div className="text-xs text-white text-opacity-70 mb-1">Logged in as</div>
+      <div className="text-lg font-bold text-yellow-300">@{currentUser}</div>
+    </div>
+  )}
+  
   <button
     onClick={() => {
       onLogout();
       setMobileMenuOpen(false);
     }}
-    className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-100 rounded-md transition"
+    className="w-full text-left px-3 py-2 bg-red-600 text-white font-semibold hover:bg-red-700 rounded-md transition"
   >
     Logout
   </button>

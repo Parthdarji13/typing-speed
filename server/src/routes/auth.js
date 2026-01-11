@@ -5,11 +5,6 @@ import { sendCredentialsEmail } from "../email.js";
 
 const router = express.Router();
 
-// random string generator
-function randomString(length = 6) {
-  return Math.random().toString(36).slice(-length);
-}
-
 router.post("/register", async (req, res) => {
   console.log("🔥 NEW REGISTER ROUTE HIT");
 
@@ -25,13 +20,25 @@ router.post("/register", async (req, res) => {
       return res.status(409).json({ error: "Email already registered" });
     }
 
-    const username =
-      name.toLowerCase().replace(/\s+/g, "") + randomString(4);
+    // ✅ Get current time (HH:MM format as HHMM)
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timeCode = hours + minutes; // e.g., "1720"
 
-    // ✅ 6-character user password
-    const plainPassword = randomString(6);
+    // ✅ Create username: cleanname_ts
+    const cleanName = name.replace(/\s+/g, '').toLowerCase();
+    const username = `${cleanName}_ts`;
 
-    // ✅ secure hashing (do NOT reduce this)
+    // ✅ Create password: CapitalizedName@TS{time}
+    const capitalizedName = name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('');
+    
+    const plainPassword = `${capitalizedName}@TS${timeCode}`;
+
+    // ✅ Hash password securely
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     await User.create({

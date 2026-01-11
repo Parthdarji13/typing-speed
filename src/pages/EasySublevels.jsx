@@ -11,13 +11,13 @@ const sublevels = [
   },
   {
     name: "Easy 2",
-    description: "30 seconds, 2-3 lines paragraph",
+    description: "30 seconds, 1-2 lines paragraph",
     route: "/easylevel2",
     levelNumber: 2
   },
   {
     name: "Easy 3",
-    description: "45 seconds, 4-5 lines paragraph",
+    description: "45 seconds, 2-3 lines paragraph",
     route: "/easylevel3",
     levelNumber: 3
   },

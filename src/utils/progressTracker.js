@@ -1,11 +1,35 @@
 // Progress tracking utility for typing speed game
 export class ProgressTracker {
-  static STORAGE_KEY = 'typingGameProgress';
+  // Get current user's username from localStorage
+  static getCurrentUser() {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        return user.username || user.email || null;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
+  }
   
-  // Get all progress data
+  // Get storage key for current user
+  static getStorageKey() {
+    const username = this.getCurrentUser();
+    if (!username) {
+      console.warn('No user logged in, using default key');
+      return 'typingGameProgress';
+    }
+    return `typingGameProgress_${username}`;
+  }
+  
+  // Get all progress data for current user
   static getProgress() {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const key = this.getStorageKey();
+      const stored = localStorage.getItem(key);
       return stored ? JSON.parse(stored) : this.getDefaultProgress();
     } catch (error) {
       console.error('Error loading progress:', error);
@@ -128,18 +152,20 @@ export class ProgressTracker {
     return { bestWpm, bestAccuracy };
   }
   
-  // Save progress to localStorage
+  // Save progress to localStorage for current user
   static saveProgress(progress) {
     try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progress));
+      const key = this.getStorageKey();
+      localStorage.setItem(key, JSON.stringify(progress));
     } catch (error) {
       console.error('Error saving progress:', error);
     }
   }
   
-  // Reset all progress
+  // Reset all progress for current user
   static resetProgress() {
-    localStorage.removeItem(this.STORAGE_KEY);
+    const key = this.getStorageKey();
+    localStorage.removeItem(key);
     return this.getDefaultProgress();
   }
   

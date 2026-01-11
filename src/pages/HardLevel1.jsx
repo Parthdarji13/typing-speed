@@ -409,7 +409,7 @@ export default function HardLevel1() {
               <div className="mt-6 flex justify-center gap-4">
                 {results.isCompleted ? (
                   <button
-                    onClick={() => navigate("/levels/hard")}
+                    onClick={() => navigate("/levels/hardlevel2")}
                     className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition"
                   >
                     Back to Hard Levels →

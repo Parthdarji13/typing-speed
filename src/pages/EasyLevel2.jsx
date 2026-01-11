@@ -409,7 +409,7 @@ export default function EasyLevel2() {
               <div className="mt-6 flex justify-center gap-4">
                 {results.isCompleted ? (
                   <button
-                    onClick={() => navigate("/Easysublevels")}
+                    onClick={() => navigate("/Easylevel3")}
                     className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition"
                   >
                     Next Level →
