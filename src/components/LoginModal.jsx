@@ -12,7 +12,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const API_BASE =
-    import.meta.env.VITE_API_URL || "http://localhost:4000";
+    import.meta.env.VITE_API_URL || "https://typing-speed-1-d5fb.onrender.com";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,6 +72,26 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
 
       // ✅ SAVE USER SESSION
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // ✅ NEW: Load progress from database
+      console.log(`📥 Loading progress for ${data.user.username}...`);
+      
+      try {
+        const progressResp = await fetch(`${API_BASE}/progress/load/${data.user.username}`);
+        const progressData = await progressResp.json();
+
+        if (progressData?.success && progressData?.progress) {
+          // Save loaded progress to localStorage
+          const storageKey = `typingGameProgress_${data.user.username}`;
+          localStorage.setItem(storageKey, JSON.stringify(progressData.progress));
+          console.log(`✅ Progress loaded from database for ${data.user.username}`);
+        } else {
+          console.log(`ℹ️ No saved progress found for ${data.user.username}`);
+        }
+      } catch (progressErr) {
+        console.warn("⚠️ Could not load progress from database:", progressErr);
+        // Don't block login if progress load fails
+      }
 
       onLoginSuccess();
     } catch (err) {
