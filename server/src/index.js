@@ -1,4 +1,5 @@
 import authRoutes from "./routes/auth.js";
+import progressRoutes from "./routes/progressRoutes.js";  // ✅ NEW
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/auth", authRoutes);
+app.use("/progress", progressRoutes);  // ✅ NEW
 
 
 // MongoDB connection
@@ -41,10 +43,6 @@ app.get("/health", (req, res) => {
 	});
 });
 
-
-
-
-
 app.post("/test/result", (req, res) => {
   console.log("📊 Typing Result Received:", req.body);
   res.json({ ok: true });
@@ -55,10 +53,9 @@ app.post("/test/result", (req, res) => {
 async function startServer() {
 	await connectMongoDB();
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
-
+	app.listen(PORT, "0.0.0.0", () => {
+		console.log(`🚀 Server running on port ${PORT}`);
+	});
 }
 
 startServer();
