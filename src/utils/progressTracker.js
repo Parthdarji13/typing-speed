@@ -1,4 +1,6 @@
 // Progress tracking utility for typing speed game
+const API_BASE = import.meta.env.VITE_API_URL || "https://typing-speed-1-d5fb.onrender.com";
+
 export class ProgressTracker {
   // Get current user's username from localStorage
   static getCurrentUser() {
@@ -88,10 +90,44 @@ export class ProgressTracker {
       progress.totalCompleted = this.calculateTotalCompleted(progress);
       progress.lastPlayed = new Date().toISOString();
       
+      // Save to localStorage immediately
       this.saveProgress(progress);
+      
+      // ✅ NEW: Sync to database in background (non-blocking)
+      this.syncToDatabase(difficulty, levelNumber, stats);
+      
       return true;
     }
     return false;
+  }
+  
+  // ✅ NEW: Background sync to database (doesn't block UI)
+  static syncToDatabase(difficulty, levelNumber, stats) {
+    const username = this.getCurrentUser();
+    
+    if (!username) {
+      console.log('❌ No user logged in, skipping database sync');
+      return;
+    }
+
+    console.log(`🔄 Syncing to database: ${difficulty} level ${levelNumber}`);
+
+    // Fire and forget - don't wait for response
+    fetch(`${API_BASE}/progress/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        difficulty,
+        levelNumber,
+        wpm: stats.wpm || 0,
+        accuracy: stats.accuracy || 0,
+        mistakes: stats.mistakes || 0
+      })
+    })
+    .then(res => res.json())
+    .then(() => console.log(`✅ Synced to database: ${difficulty} level ${levelNumber}`))
+    .catch(err => console.error('❌ Database sync failed:', err));
   }
   
   // Calculate total completed levels
