@@ -419,7 +419,7 @@ export default function HardLevel3() {
                     onClick={() => navigate("/levels")}
                     className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 transition"
                   >
-                    Back to Hard Levels →
+                    Back to Levels →
                   </button>
                 ) : (
                   <button
